@@ -1,52 +1,42 @@
 package com.leiva.ListaReproducion.service;
 
-import com.leiva.ListaReproducion.model.DTO.PlayListDTO;
 import com.leiva.ListaReproducion.model.DTO.PlayListResponseDTO;
 import com.leiva.ListaReproducion.model.DTO.RequestDTO;
-import com.leiva.ListaReproducion.repository.MapPlayListRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.leiva.ListaReproducion.repository.PlayListRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+
 public class PlayListResource {
+    private PlayListRepository playListRepository;
 
-    @Autowired
-    MapPlayListRepository  mapPlayListRepository;
-
+    public PlayListResource(PlayListRepository playListRepository){
+        this.playListRepository = playListRepository;
+    }
 
     public PlayListResponseDTO addList(RequestDTO requestDTO){
         PlayListResponseDTO playListResponseDTO = new PlayListResponseDTO();
-        PlayListDTO playListDTO = requestDTO.getPlayListDTO();
-        playListResponseDTO.setPlayListDTO(playListDTO);
+        playListResponseDTO.setPlayListDTO(requestDTO.getPlayListDTO());
         playListResponseDTO.setMessage("201 Created");
-        mapPlayListRepository.save(playListDTO);
+        playListRepository.save(requestDTO.getPlayListDTO());
         return playListResponseDTO;
 
     }
-    public List<PlayListDTO> getLists(){
-        return mapPlayListRepository.getList();
+    public List<String> getNameLists(){
+        List<String> playList = playListRepository.getNameLists();
+        return playList;
     }
 
-    public PlayListDTO getListByName(RequestDTO requestDTO){
-
-        List<PlayListDTO> playListDTOS = mapPlayListRepository.getList();
-
-        for (PlayListDTO playListDTO : playListDTOS) {
-            if (playListDTO.getName().equalsIgnoreCase(requestDTO.getPlayListDTO().getName())){
-                return playListDTO;
-            }
-        }
-        return null;
+    public String getDescriptionByName(String nameList){
+        return playListRepository.getDescriptionByName(nameList);
     }
-    public String modList(RequestDTO requestDTO){
-        List<PlayListDTO> playListDTOS = mapPlayListRepository.getList();
-        for (PlayListDTO playListDTO:playListDTOS) {
-           if (playListDTO.getName().equalsIgnoreCase(requestDTO.getPlayListDTO().getName())){
-               return "204 No Content";
-           }
-        }
-        return "404 NoT Found";
+
+    public PlayListResponseDTO putNewContentOnList(RequestDTO requestDTO,String nameList){
+       return playListRepository.putNewContentOnTheList(requestDTO.getPlayListDTO(),nameList);
     }
+    public String deleteFromRow(String nameList){
+        return playListRepository.deleteRow(nameList);
+    }
+
 }
